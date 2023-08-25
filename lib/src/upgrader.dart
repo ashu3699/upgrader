@@ -698,27 +698,27 @@ class Upgrader with WidgetsBindingObserver {
             children: [
               //skip
               if (_numberOfTimesPrompted < 3)
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      //update number of times prompted
-                      _numberOfTimesPrompted++;
-                      //save to shared prefs
-                      onUserIgnored(context, true);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFFB7202E),
+                OutlinedButton(
+                  onPressed: () async {
+                    //update number of times prompted
+                    _numberOfTimesPrompted++;
+                    //save to shared prefs
+                    var prefs = await SharedPreferences.getInstance();
+                    await prefs.setInt(
+                        'numberOfTimesPrompted', _numberOfTimesPrompted);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      "SKIP" " (${3 - _numberOfTimesPrompted})",
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFFB7202E),
+                  ),
+                  child: Text(
+                    "SKIP" " (${3 - _numberOfTimesPrompted})",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -911,7 +911,7 @@ class Upgrader with WidgetsBindingObserver {
 
     _userIgnoredVersion = _appStoreVersion;
     await prefs.setString('userIgnoredVersion', _userIgnoredVersion ?? '');
-    await prefs.setInt('numberOfTimesPrompted', _numberOfTimesPrompted);
+
     return true;
   }
 
