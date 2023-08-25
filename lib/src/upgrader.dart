@@ -695,52 +695,61 @@ class Upgrader with WidgetsBindingObserver {
           ),
           const SizedBox(height: 10),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              //skip
+              if (_numberOfTimesPrompted < 3) const SizedBox(width: 15),
               if (_numberOfTimesPrompted < 3)
-                OutlinedButton(
-                  onPressed: () async {
-                    //update number of times prompted
-                    _numberOfTimesPrompted++;
-                    //save to shared prefs
-                    var prefs = await SharedPreferences.getInstance();
-                    await prefs.setInt(
-                        'numberOfTimesPrompted', _numberOfTimesPrompted);
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      //update number of times prompted
+                      _numberOfTimesPrompted++;
+                      //save to shared prefs
+                      var prefs = await SharedPreferences.getInstance();
+                      await prefs.setInt(
+                          'numberOfTimesPrompted', _numberOfTimesPrompted);
+                      // ignore: use_build_context_synchronously
+                      popNavigator(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFFB7202E),
+                    ),
+                    child: Text(
+                      "SKIP" " (${3 - _numberOfTimesPrompted})",
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    onUserUpdated(context, !blocked());
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFFB7202E),
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFB7202E),
                   ),
-                  child: Text(
-                    "SKIP" " (${3 - _numberOfTimesPrompted})",
-                    style: const TextStyle(
+                  child: const Text(
+                    "UPDATE NOW",
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ElevatedButton(
-                onPressed: () {
-                  onUserUpdated(context, !blocked());
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color(0xFFB7202E),
-                ),
-                child: const Text(
-                  "UPDATE NOW",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ),
+              const SizedBox(width: 15),
             ],
           ),
           //show skips left
