@@ -153,7 +153,7 @@ class Upgrader with WidgetsBindingObserver {
   bool _isCriticalUpdate = false;
 
   //custom
-  int _numberOfTimesPrompted = 0;
+  // int _numberOfTimesPrompted = 0;
 
   /// Track the initialization future so that [initialize] can be called multiple times.
   Future<bool>? _futureInit;
@@ -598,9 +598,9 @@ class Upgrader with WidgetsBindingObserver {
     }
     final isAvailable = _updateAvailable != null;
     //custom
-    if (isAvailable) {
-      _numberOfTimesPrompted = 0;
-    }
+    // if (isAvailable) {
+    //   _numberOfTimesPrompted = 0;
+    // }
     if (debugLogging) print('upgrader: isUpdateAvailable: $isAvailable');
     return isAvailable;
   }
@@ -694,73 +694,27 @@ class Upgrader with WidgetsBindingObserver {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (_numberOfTimesPrompted < 3) const SizedBox(width: 15),
-              if (_numberOfTimesPrompted < 3)
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      //update number of times prompted
-                      _numberOfTimesPrompted++;
-                      //save to shared prefs
-                      var prefs = await SharedPreferences.getInstance();
-                      await prefs.setInt(
-                          'numberOfTimesPrompted', _numberOfTimesPrompted);
-                      // ignore: use_build_context_synchronously
-                      popNavigator(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFFB7202E),
-                    ),
-                    child: Text(
-                      "SKIP" " (${3 - _numberOfTimesPrompted})",
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                onUserUpdated(context, !blocked());
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    onUserUpdated(context, !blocked());
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color(0xFFB7202E),
-                  ),
-                  child: const Text(
-                    "UPDATE NOW",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFFB7202E),
               ),
-              const SizedBox(width: 15),
-            ],
-          ),
-          //show skips left
-          if (_numberOfTimesPrompted > 2)
-            const Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: Text(
-                "You have skipped the update 3 times,\nplease update the app to continue",
-                textAlign: TextAlign.center,
+              child: const Text(
+                "UPDATE NOW",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
+          ),
           const SizedBox(height: 10),
         ],
       ),
@@ -948,7 +902,7 @@ class Upgrader with WidgetsBindingObserver {
     _userIgnoredVersion = prefs.getString('userIgnoredVersion');
 
     //custom
-    _numberOfTimesPrompted = prefs.getInt('numberOfTimesPrompted') ?? 0;
+    // _numberOfTimesPrompted = prefs.getInt('numberOfTimesPrompted') ?? 0;
 
     return true;
   }
