@@ -694,7 +694,6 @@ class Upgrader with WidgetsBindingObserver {
             "New version of the app is available,\nplease click here to update",
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 10),
         ],
       ),
       actionsAlignment: MainAxisAlignment.center,
