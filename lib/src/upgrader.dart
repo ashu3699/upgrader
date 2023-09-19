@@ -672,7 +672,8 @@ class Upgrader with WidgetsBindingObserver {
   }
 
   Widget _customDialog(BuildContext context) {
-    return Dialog(
+    return AlertDialog(
+      scrollable: true,
       backgroundColor: const Color(0xfffdf2df),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -681,7 +682,7 @@ class Upgrader with WidgetsBindingObserver {
           width: 3,
         ),
       ),
-      child: Column(
+      content: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -694,30 +695,29 @@ class Upgrader with WidgetsBindingObserver {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                onUserUpdated(context, !blocked());
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xFFB7202E),
-              ),
-              child: const Text(
-                "UPDATE NOW",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
         ],
       ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            onUserUpdated(context, !blocked());
+          },
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xFFB7202E),
+          ),
+          child: const Text(
+            "UPDATE NOW",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
