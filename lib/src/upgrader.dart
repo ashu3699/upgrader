@@ -697,6 +697,7 @@ class Upgrader with WidgetsBindingObserver {
           const SizedBox(height: 10),
         ],
       ),
+      actionsAlignment: MainAxisAlignment.center,
       actions: [
         ElevatedButton(
           onPressed: () {
