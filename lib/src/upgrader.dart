@@ -92,7 +92,7 @@ class Upgrader with WidgetsBindingObserver {
   final Duration durationUntilAlertAgain;
 
   /// The localized messages used for display in upgrader.
-  UpgraderMessages messages;
+  UpgraderMessages? messages;
 
   /// The minimum app version supported by this app. Earlier versions of this app
   /// will be forced to update to the current version. Optional.
@@ -173,7 +173,7 @@ class Upgrader with WidgetsBindingObserver {
   Upgrader({
     this.appcastConfig,
     this.appcast,
-    UpgraderMessages? messages,
+    this.messages,
     this.debugDisplayAlways = false,
     this.debugDisplayOnce = false,
     this.debugLogging = false,
@@ -195,7 +195,6 @@ class Upgrader with WidgetsBindingObserver {
     this.cupertinoButtonTextStyle,
     UpgraderOS? upgraderOS,
   })  : client = client ?? http.Client(),
-        messages = messages ?? UpgraderMessages(),
         upgraderOS = upgraderOS ?? UpgraderOS() {
     if (debugLogging) print("upgrader: instantiated.");
   }
@@ -233,12 +232,6 @@ class Upgrader with WidgetsBindingObserver {
         return true;
       }
       _initCalled = true;
-
-      if (messages.languageCode.isEmpty) {
-        print('upgrader: error -> languageCode is empty');
-      } else if (debugLogging) {
-        print('upgrader: languageCode: ${messages.languageCode}');
-      }
 
       await _getSavedPrefs();
 
@@ -456,7 +449,7 @@ class Upgrader with WidgetsBindingObserver {
 
   String? get releaseNotes => _releaseNotes;
 
-  String message() {
+  String body(UpgraderMessages messages) {
     var msg = messages.message(UpgraderMessage.body)!;
     msg = msg.replaceAll('{{appName}}', appName());
     msg = msg.replaceAll(
@@ -477,15 +470,53 @@ class Upgrader with WidgetsBindingObserver {
       }
       if (shouldDisplay) {
         _displayed = true;
+        final appMessages = determineMessages(context);
+
         Future.delayed(const Duration(milliseconds: 0), () {
           _showDialog(
-              context: context,
-              title: messages.message(UpgraderMessage.title),
-              message: message(),
-              releaseNotes: shouldDisplayReleaseNotes() ? _releaseNotes : null,
-              canDismissDialog: canDismissDialog);
+            context: context,
+            title: appMessages.message(UpgraderMessage.title),
+            message: body(appMessages),
+            releaseNotes: shouldDisplayReleaseNotes() ? _releaseNotes : null,
+            canDismissDialog: canDismissDialog,
+            messages: appMessages,
+          );
         });
       }
+    }
+  }
+
+  /// Determine which [UpgraderMessages] object to use. It will be either the one passed
+  /// to [Upgrader], or one based on the app locale.
+  UpgraderMessages determineMessages(BuildContext context) {
+    {
+      late UpgraderMessages appMessages;
+      if (messages != null) {
+        appMessages = messages!;
+      } else {
+        String? languageCode;
+        try {
+          // Get the current locale in the app.
+          final locale = Localizations.localeOf(context);
+          // Get the current language code in the app.
+          languageCode = locale.languageCode;
+          if (debugLogging) {
+            print('upgrader: current locale: $locale');
+          }
+        } catch (e) {
+          // ignored, really.
+        }
+
+        appMessages = UpgraderMessages(code: languageCode);
+      }
+
+      if (appMessages.languageCode.isEmpty) {
+        print('upgrader: error -> languageCode is empty');
+      } else if (debugLogging) {
+        print('upgrader: languageCode: ${appMessages.languageCode}');
+      }
+
+      return appMessages;
     }
   }
 
@@ -641,12 +672,14 @@ class Upgrader with WidgetsBindingObserver {
     return code;
   }
 
-  void _showDialog(
-      {required BuildContext context,
-      required String? title,
-      required String message,
-      required String? releaseNotes,
-      required bool canDismissDialog}) {
+  void _showDialog({
+    required BuildContext context,
+    required String? title,
+    required String message,
+    required String? releaseNotes,
+    required bool canDismissDialog,
+    required UpgraderMessages messages,
+  }) {
     if (debugLogging) {
       print('upgrader: showDialog title: $title');
       print('upgrader: showDialog message: $message');
@@ -665,7 +698,7 @@ class Upgrader with WidgetsBindingObserver {
           child: dialogStyle == UpgradeDialogStyle.custom
               ? _customDialog(context)
               : _alertDialog(title ?? '', message, releaseNotes, context,
-                  dialogStyle == UpgradeDialogStyle.cupertino),
+                  dialogStyle == UpgradeDialogStyle.cupertino, messages),
         );
       },
     );
@@ -740,14 +773,16 @@ class Upgrader with WidgetsBindingObserver {
   }
 
   Widget _alertDialog(String title, String message, String? releaseNotes,
-      BuildContext context, bool cupertino) {
+      BuildContext context, bool cupertino, UpgraderMessages messages) {
     Widget? notes;
     if (releaseNotes != null) {
       notes = Padding(
           padding: const EdgeInsets.only(top: 15.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: cupertino
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
             children: <Widget>[
               Text(messages.message(UpgraderMessage.releaseNotes) ?? '',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -760,7 +795,8 @@ class Upgrader with WidgetsBindingObserver {
         constraints: const BoxConstraints(maxHeight: 400),
         child: SingleChildScrollView(
             child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              cupertino ? CrossAxisAlignment.center : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(message),

@@ -1,3 +1,13 @@
+## Next
+
+- [356] Fixed centering issue with Cupertino style UpgradeAlert dialog.
+
+## 8.3.0
+
+- [311] Changed the shared_preferences dependency version to '>=2.1.1 <3.0.0' to allow more compatibility.
+- [299] Updated UpgradeCard to allow scrolling of release notes.
+- Improved language code support so that it is updated with the app.
+
 ## 8.2.0
 
 - [336] Changed the device_info_plus dependency version from ^9.0.1 to any which now allows for older versions.

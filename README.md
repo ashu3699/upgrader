@@ -37,6 +37,14 @@ will become more likely that users on other app stores need to be nagged about u
 The widgets come in two flavors: alert or card. The [UpgradeAlert](#alert-example) widget is used to display the
 popup alert prompt, and the [UpgradeCard](#card-example) widget is used to display the inline material design card.
 
+There are three buttons displayed to the user: IGNORE, LATER, and UPDATE NOW.
+
+Tapping IGNORE prevents the alert from being displayed again for that version.
+
+Tapping the LATER button just closes the alert allowing the alert to be displayed sometime in the future.
+
+Tapping the UPDATE NOW button takes the user to the App Store (iOS) or Google Play Store (Android) where the user is required to initiate the update process.
+
 ## Alert Example
 
 Just wrap your body widget in the `UpgradeAlert` widget, and it will handle the rest.
@@ -317,7 +325,7 @@ UpgradeAlert(Upgrader(messages: MyUpgraderMessages()));
 ## Language localization
 
 The strings displayed in `upgrader` are already localized in 34 languages. New languages will be
-supported in the future with minor updates.
+supported in the future with minor updates. It also supports right to left languages.
 
 Languages supported:
 * English ('en')
